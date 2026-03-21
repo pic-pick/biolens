@@ -145,8 +145,7 @@ const isScrapped = computed(() =>
 
 function handleScrap() {
   if (isScrapped.value || !result.value) return
-  scrapId.value = Date.now().toString()
-  scrapSynthesis(props.papers, result.value)
+  scrapId.value = scrapSynthesis(props.papers, result.value)
 }
 
 watch(() => props.papers, async (papers) => {

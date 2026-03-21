@@ -1,5 +1,23 @@
 <template>
-  <div class="h-screen flex flex-col bg-base overflow-hidden">
+  <div class="h-screen flex flex-col bg-base overflow-hidden relative">
+
+    <!-- Global ambient blobs -->
+    <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <!-- 도트 그리드 -->
+      <div class="dot-grid" />
+      <!-- 오로라 -->
+      <div class="aurora" />
+      <!-- 블롭 -->
+      <div class="blob blob-1" />
+      <div class="blob blob-2" />
+      <div class="blob blob-3" />
+      <div class="blob blob-4" />
+      <div class="blob blob-5" />
+      <div class="blob blob-6" />
+      <div class="blob blob-7" />
+      <!-- 비네트 — 블롭이 텍스트 가독성 해치지 않도록 가장자리 어둡게 -->
+      <div class="vignette" />
+    </div>
 
     <!-- Header -->
     <AppHeader
@@ -18,6 +36,7 @@
         :last-query="lastQuery"
         @search="handleSearch"
         @filter-change="onFilterChange"
+        @about="showAbout = true"
       />
 
       <!-- Main content -->
@@ -78,6 +97,13 @@
 
             <!-- Results grid -->
             <template v-else-if="results.length > 0">
+              <!-- 검색어 & 결과 수 -->
+              <p class="text-xs text-slate-500 mb-4">
+                <span class="text-slate-200 font-semibold">"{{ lastQuery }}"</span>
+                &nbsp;검색 결과&nbsp;
+                <span class="text-slate-400 tabular-nums">{{ totalCount.toLocaleString() }}건</span>
+              </p>
+
               <!-- 연구 동향 차트 -->
               <div v-if="hasYearData || isChartLoading" class="mb-5 bg-surface border border-slate-800 rounded-xl overflow-hidden">
                 <button
@@ -134,21 +160,12 @@
                 </div>
               </div>
 
-              <!-- Load more -->
-              <div v-if="canLoadMore" class="flex justify-center pt-8">
-                <button
-                  class="btn-ghost px-8 py-3"
-                  :disabled="isLoadingMore"
-                  @click="handleLoadMore"
-                >
-                  <span v-if="isLoadingMore" class="flex items-center gap-2">
-                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-                    </svg>불러오는 중
-                  </span>
-                  <span v-else>다음 20개 보기</span>
-                </button>
+              <!-- 무한 스크롤 로딩 인디케이터 -->
+              <div v-if="isLoadingMore" class="flex justify-center py-8">
+                <svg class="w-5 h-5 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
               </div>
               <p
                 v-else-if="results.length >= totalCount || results.length >= 10000"
@@ -182,16 +199,24 @@
           <span class="text-xs text-slate-400 font-medium tabular-nums">
             <span class="text-slate-100 font-semibold">{{ selectedPapers.length }}</span>
             <span class="text-slate-600"> / {{ MAX_SELECT }}</span>
-            &nbsp;selected
+            &nbsp;편 선택
           </span>
           <div class="w-px h-4 bg-slate-700" />
+
+          <button
+            class="btn-ghost text-xs px-4 py-2 disabled:opacity-40"
+            :disabled="selectedPapers.length < 2 || selectedPapers.some(p => !p.abstract)"
+            :title="selectedPapers.some(p => !p.abstract) ? '초록이 있는 논문만 비교 가능합니다' : ''"
+            @click="showComparison = true"
+          >Compare</button>
+
           <button
             class="btn-primary text-xs px-4 py-2 disabled:opacity-40"
-            :disabled="selectedPapers.length < 2"
+            :disabled="selectedPapers.length < 2 || selectedPapers.some(p => !p.abstract)"
+            :title="selectedPapers.some(p => !p.abstract) ? '초록이 있는 논문만 분석 가능합니다' : ''"
             @click="showSynthesis = true"
-          >
-            Analyze
-          </button>
+          >Analyze</button>
+
           <button
             class="text-xs text-slate-500 hover:text-slate-300 transition-colors"
             @click="clearSelection"
@@ -207,6 +232,16 @@
       @close="showSynthesis = false"
     />
 
+    <!-- Comparison panel -->
+    <ComparisonPanel
+      v-if="showComparison"
+      :papers="selectedPapers"
+      @close="showComparison = false"
+    />
+
+    <!-- About page -->
+    <AboutPage v-if="showAbout" @close="showAbout = false" />
+
   </div>
 </template>
 
@@ -218,8 +253,10 @@ import ScrapBoard     from './components/ScrapBoard.vue'
 import SkeletonCard   from './components/SkeletonCard.vue'
 import PaperCard      from './components/PaperCard.vue'
 import EmptyState     from './components/EmptyState.vue'
-import SynthesisPanel from './components/SynthesisPanel.vue'
+import SynthesisPanel   from './components/SynthesisPanel.vue'
+import ComparisonPanel  from './components/ComparisonPanel.vue'
 import TrendChart     from './components/TrendChart.vue'
+import AboutPage      from './components/AboutPage.vue'
 import { usePubmed }  from './composables/usePubmed.js'
 import { fetchCitations } from './composables/useICite.js'
 import { useScrap }   from './composables/useScrap.js'
@@ -264,8 +301,10 @@ const lastQuery    = ref('')
 const currentQuery = ref('')
 
 // Multi-select
-const selectedPapers = ref([])
-const showSynthesis  = ref(false)
+const selectedPapers  = ref([])
+const showSynthesis   = ref(false)
+const showComparison  = ref(false)
+const showAbout       = ref(false)
 const MAX_SELECT = 5
 
 const emptyState = computed(() => {
@@ -277,7 +316,6 @@ const emptyState = computed(() => {
 function toggleSelect(paper) {
   const idx = selectedPapers.value.findIndex((p) => p.pmid === paper.pmid)
   if (idx === -1) {
-    if (!paper.abstract) return
     if (selectedPapers.value.length >= MAX_SELECT) return
     selectedPapers.value.push(paper)
   } else {
@@ -297,16 +335,21 @@ function clearSelection() {
 const leftCol  = computed(() => results.value.filter((_, i) => i % 2 === 0))
 const rightCol = computed(() => results.value.filter((_, i) => i % 2 === 1))
 
-// Scroll progress
+// Scroll progress + 무한 스크롤
 function onScroll(e) {
   const el = e.target
   const max = el.scrollHeight - el.clientHeight
   scrollProgress.value = max > 0 ? Math.round((el.scrollTop / max) * 100) : 0
+  // 하단 200px 이내 진입 시 자동 로드
+  if (canLoadMore.value && !isLoadingMore.value && max > 0 && el.scrollTop >= max - 200) {
+    handleLoadMore()
+  }
 }
 
-// Saved 탭 진입 시 사이드바 자동 접기
+// 탭 전환 시 사이드바 상태 자동 조정
 watch(activeTab, (tab) => {
-  if (tab === 'scrap') sidebar.value?.collapse()
+  if (tab === 'scrap')   sidebar.value?.collapse()
+  if (tab === 'explore') sidebar.value?.expand()
 })
 
 // 필터 변경 → 자동 재검색 (새 검색어 이력 추가 없이)
@@ -352,6 +395,7 @@ async function handleSearch(query) {
   await search(query, filters)
 
   if (results.value.length > 0) {
+    showChart.value = true                              // ① 자동 차트 열기
     fetchYearCounts(query, filters)
     applyICite(results.value.map((p) => p.pmid))
   }
@@ -383,4 +427,150 @@ async function applyICite(pmids) {
 .float-bar-enter-active { animation: floatUp 0.35s ease forwards; }
 .float-bar-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
 .float-bar-leave-to     { opacity: 0; transform: translateX(-50%) translateY(12px); }
+
+.folder-drop-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.folder-drop-leave-active { transition: opacity 0.1s ease, transform 0.1s ease; }
+.folder-drop-enter-from, .folder-drop-leave-to { opacity: 0; transform: translateY(4px); }
+
+/* ── 비네트 ── */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(6,11,24,0.55) 100%);
+  pointer-events: none;
+}
+
+/* ── 도트 그리드 ── */
+.dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(148,163,184,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── 오로라 (상단 수평 글로우) ── */
+.aurora {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 320px;
+  background: radial-gradient(ellipse at 50% 0%,
+    rgba(99,102,241,0.35) 0%,
+    rgba(6,182,212,0.2) 35%,
+    transparent 70%
+  );
+  filter: blur(40px);
+  animation: auroraPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes auroraPulse {
+  0%   { opacity: 0.7; transform: translateX(-50%) scaleX(1);    }
+  50%  { opacity: 1.0; transform: translateX(-50%) scaleX(1.08); }
+  100% { opacity: 0.8; transform: translateX(-50%) scaleX(0.96); }
+}
+
+/* ── Global ambient blobs ── */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+
+.blob-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle at 40% 40%, #6366f1 0%, transparent 60%);
+  filter: blur(80px);
+  opacity: 0.28;
+  top: -20%; left: -12%;
+  animation: drift1 16s ease-in-out infinite alternate;
+}
+.blob-2 {
+  width: 580px; height: 580px;
+  background: radial-gradient(circle at 60% 50%, #06b6d4 0%, transparent 60%);
+  filter: blur(90px);
+  opacity: 0.22;
+  top: 15%; right: -10%;
+  animation: drift2 20s ease-in-out infinite alternate;
+}
+.blob-3 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle at 50% 50%, #8b5cf6 0%, transparent 60%);
+  filter: blur(70px);
+  opacity: 0.24;
+  bottom: 0%; left: 20%;
+  animation: drift3 24s ease-in-out infinite alternate;
+}
+.blob-4 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle at 50% 50%, #0ea5e9 0%, transparent 60%);
+  filter: blur(60px);
+  opacity: 0.2;
+  top: 50%; left: 2%;
+  animation: drift4 18s ease-in-out infinite alternate;
+}
+.blob-5 {
+  width: 340px; height: 340px;
+  background: radial-gradient(circle at 50% 50%, #a78bfa 0%, transparent 60%);
+  filter: blur(65px);
+  opacity: 0.22;
+  top: 8%; left: 42%;
+  animation: drift5 22s ease-in-out infinite alternate;
+}
+/* 추가 블롭 — 핑크/마젠타 */
+.blob-6 {
+  width: 440px; height: 440px;
+  background: radial-gradient(circle at 50% 50%, #ec4899 0%, transparent 60%);
+  filter: blur(85px);
+  opacity: 0.14;
+  bottom: 10%; right: 5%;
+  animation: drift6 26s ease-in-out infinite alternate;
+}
+/* 추가 블롭 — 에메랄드 */
+.blob-7 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle at 50% 50%, #10b981 0%, transparent 60%);
+  filter: blur(70px);
+  opacity: 0.16;
+  top: 40%; left: 35%;
+  animation: drift7 19s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  0%   { transform: translate(0px,   0px)   scale(1);    }
+  50%  { transform: translate(90px,  60px)  scale(1.08); }
+  100% { transform: translate(40px, 110px)  scale(0.95); }
+}
+@keyframes drift2 {
+  0%   { transform: translate(0px,   0px)   scale(1);    }
+  50%  { transform: translate(-80px, 70px)  scale(1.1);  }
+  100% { transform: translate(-40px, 130px) scale(0.92); }
+}
+@keyframes drift3 {
+  0%   { transform: translate(0px,    0px)  scale(1);    }
+  50%  { transform: translate(70px,  -80px) scale(1.12); }
+  100% { transform: translate(-50px, -40px) scale(0.96); }
+}
+@keyframes drift4 {
+  0%   { transform: translate(0px,   0px)   scale(1);    }
+  50%  { transform: translate(60px,  -70px) scale(1.07); }
+  100% { transform: translate(-30px, -90px) scale(1.14); }
+}
+@keyframes drift5 {
+  0%   { transform: translate(0px,   0px)  scale(1);   }
+  50%  { transform: translate(-60px, 80px) scale(0.9); }
+  100% { transform: translate(50px,  50px) scale(1.1); }
+}
+@keyframes drift6 {
+  0%   { transform: translate(0px,  0px)   scale(1);    }
+  50%  { transform: translate(-80px, -60px) scale(1.1); }
+  100% { transform: translate(30px, -100px) scale(0.93); }
+}
+@keyframes drift7 {
+  0%   { transform: translate(0px, 0px)   scale(1);    }
+  50%  { transform: translate(70px, -50px) scale(1.15); }
+  100% { transform: translate(-40px, 60px) scale(0.88); }
+}
 </style>

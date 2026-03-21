@@ -6,7 +6,7 @@
       <button
         class="flex items-center gap-2.5 shrink-0 hover:opacity-80 active:scale-95 transition-all duration-150"
         title="홈으로 돌아가기"
-        @click="() => window.location.reload()"
+        @click="reload"
       >
         <div class="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
           <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -41,4 +41,6 @@ defineProps({
 const emit = defineEmits(['search', 'query-input'])
 const searchBarRef = ref(null)
 defineExpose({ setQuery: (v) => searchBarRef.value?.setQuery(v) })
+
+function reload() { window.location.reload() }
 </script>

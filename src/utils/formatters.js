@@ -4,7 +4,7 @@
  */
 export function parseYear(pubdate) {
   if (!pubdate) return null
-  const match = pubdate.match(/\d{4}/)
+  const match = pubdate.match(/\b(19|20)\d{2}\b/)
   return match ? parseInt(match[0]) : null
 }
 

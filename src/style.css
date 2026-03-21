@@ -16,9 +16,10 @@ html, body {
 
 body {
   background-color: #060B18;
-  color: #E2E8F0;
+  color: #E8EDF5;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
 
 /* Scrollbar */
@@ -51,7 +52,7 @@ body {
   }
 
   .card-dark {
-    background-color: #0F172A;
+    background-color: #080d1a;
     @apply border border-slate-800 rounded-xl transition-all duration-200;
   }
   .card-dark:hover {

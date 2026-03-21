@@ -8,18 +8,8 @@
     @mouseleave="onMouseLeave"
   >
 
-    <!-- 상단: 체크박스 + 배지 -->
+    <!-- 상단: 연도 + pubtype 배지 + citation -->
     <div class="flex flex-wrap items-center gap-2 mb-3">
-      <input
-        type="checkbox"
-        :checked="isSelected"
-        :disabled="(!paper.abstract && !paper.hasAbstract) || selectDisabled"
-        :title="!paper.abstract && !paper.hasAbstract
-          ? '초록이 없어 종합 분석에 포함할 수 없습니다'
-          : selectDisabled ? '최대 5편까지 선택할 수 있습니다' : '종합 분석에 추가'"
-        class="w-4 h-4 rounded border-slate-600 bg-elevated text-primary focus:ring-primary/30 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-        @change="emit('toggle', paper)"
-      />
       <span v-if="paper.year" class="text-xs text-slate-500 tabular-nums">{{ paper.year }}</span>
       <span
         v-for="pt in paper.pubtype?.slice(0, 2)"
@@ -89,9 +79,7 @@
       <button
         class="btn-ghost text-xs px-3 py-1.5"
         @click="isExpanded = !isExpanded"
-      >
-        {{ isExpanded ? '접기' : '초록 보기' }}
-      </button>
+      >{{ isExpanded ? '접기' : '초록 보기' }}</button>
 
       <button
         class="text-xs px-3 py-1.5 rounded-lg border transition-all duration-150 font-medium"
@@ -126,29 +114,122 @@
         class="text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300 transition-all duration-150"
       >DOI</a>
 
-      <!-- 스크랩 -->
+      <!-- 비교/분석 전용 버튼 -->
       <button
-        class="ml-auto text-xs px-3 py-1.5 rounded-lg border transition-all duration-150"
-        :class="isPaperScraped(paper.pmid)
-          ? 'border-yellow-700/50 bg-yellow-900/20 text-yellow-500'
-          : 'border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300'"
-        @click="isPaperScraped(paper.pmid) ? unscrapPaper(paper.pmid) : scrapPaper(paper, aiSummary)"
+        class="text-xs px-3 py-1.5 rounded-lg border font-medium transition-all duration-150"
+        :class="!paper.hasAbstract
+          ? 'border-slate-800/50 text-slate-700 opacity-40 cursor-not-allowed pointer-events-none'
+          : isSelected
+            ? 'border-primary bg-primary/15 text-primary'
+            : selectDisabled
+              ? 'border-slate-800 text-slate-700 cursor-not-allowed'
+              : 'border-slate-700 text-slate-400 hover:border-primary/40 hover:text-primary/80'"
+        :disabled="!paper.hasAbstract || (selectDisabled && !isSelected)"
+        :title="!paper.hasAbstract ? '초록이 없어 비교/분석 불가' : selectDisabled && !isSelected ? '최대 5편까지 선택 가능합니다' : isSelected ? '비교/분석 목록에서 제외' : '비교/분석 목록에 추가'"
+        @click="emit('toggle', paper)"
       >
-        {{ isPaperScraped(paper.pmid) ? 'Saved' : 'Save' }}
+        <span v-if="isSelected">✓ 선택됨</span>
+        <span v-else>+ 비교·분석</span>
       </button>
+
+      <!-- Save 버튼 (폴더 피커) -->
+      <div class="relative ml-auto" @click.stop>
+        <button
+          class="text-xs px-3 py-1.5 rounded-lg border transition-all duration-150 flex items-center gap-1"
+          :class="isPaperScraped(paper.pmid)
+            ? 'border-yellow-700/50 bg-yellow-900/20 text-yellow-500 hover:bg-yellow-900/30'
+            : 'border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300'"
+          @click="showFolderPicker = !showFolderPicker"
+        >
+          {{ isPaperScraped(paper.pmid) ? 'Saved' : 'Save' }}
+          <svg class="w-3 h-3 opacity-60 transition-transform" :class="showFolderPicker ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- 폴더 선택 드롭다운 -->
+        <Transition name="folder-drop">
+          <div
+            v-if="showFolderPicker"
+            class="absolute bottom-full right-0 mb-1.5 z-30 bg-elevated border border-slate-700 rounded-xl shadow-xl py-1 min-w-[168px]"
+          >
+            <p class="px-3 pt-1.5 pb-1 text-[10px] font-semibold text-slate-600 uppercase tracking-widest">폴더 선택 후 저장</p>
+
+            <!-- 미분류 -->
+            <button
+              class="w-full px-3 py-1.5 text-left text-[11px] hover:bg-slate-800/60 transition-colors flex items-center gap-2"
+              :class="currentFolderOf(paper.pmid) === null && isPaperScraped(paper.pmid) ? 'text-slate-200' : 'text-slate-400 hover:text-slate-200'"
+              @click="saveToFolder(null)"
+            >
+              <svg class="w-3 h-3 shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              미분류
+              <span v-if="currentFolderOf(paper.pmid) === null && isPaperScraped(paper.pmid)" class="ml-auto text-primary">✓</span>
+            </button>
+
+            <div v-if="projects.length" class="h-px bg-slate-800 mx-2 my-0.5" />
+
+            <!-- 폴더 목록 -->
+            <button
+              v-for="proj in projects"
+              :key="proj.id"
+              class="w-full px-3 py-1.5 text-left text-[11px] hover:bg-slate-800/60 transition-colors flex items-center gap-2"
+              :class="currentFolderOf(paper.pmid) === proj.id ? 'text-slate-200' : 'text-slate-400 hover:text-slate-200'"
+              @click="saveToFolder(proj.id)"
+            >
+              <span class="w-2 h-2 rounded-full shrink-0" :style="{ background: proj.color }" />
+              <span class="truncate">{{ proj.name }}</span>
+              <span v-if="currentFolderOf(paper.pmid) === proj.id" class="ml-auto text-primary">✓</span>
+            </button>
+
+            <div class="h-px bg-slate-800 mx-2 my-0.5" />
+
+            <!-- 새 폴더 -->
+            <button
+              class="w-full px-3 py-1.5 text-left text-[11px] text-slate-500 hover:text-slate-200 hover:bg-slate-800/60 transition-colors flex items-center gap-2"
+              @click="showNewFolder = true; showFolderPicker = false"
+            >
+              <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+              </svg>
+              새 폴더
+            </button>
+
+            <!-- 이미 저장됐으면: 저장 취소 -->
+            <template v-if="isPaperScraped(paper.pmid)">
+              <div class="h-px bg-slate-800 mx-2 my-0.5" />
+              <button
+                class="w-full px-3 py-1.5 text-left text-[11px] text-red-500 hover:bg-red-900/20 transition-colors"
+                @click="unscrapPaper(paper.pmid); showFolderPicker = false"
+              >저장 취소</button>
+            </template>
+          </div>
+        </Transition>
+      </div>
     </div>
   </div>
+
+  <!-- 새 폴더 모달 -->
+  <ProjectCreateModal
+    v-if="showNewFolder"
+    @close="showNewFolder = false"
+    @created="(id) => { saveToFolder(id); showNewFolder = false }"
+  />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import CitationBadge from './CitationBadge.vue'
 import AiSummary from './AiSummary.vue'
+import ProjectCreateModal from './ProjectCreateModal.vue'
 import { summarizeAbstract, translateAbstract } from '../composables/useOpenAI.js'
 import { useScrap } from '../composables/useScrap.js'
+import { useProjects } from '../composables/useProjects.js'
 import { useTilt } from '../composables/useTilt.js'
 
-const { scrapPaper, unscrapPaper, isPaperScraped } = useScrap()
+const { scrapPaper, unscrapPaper, isPaperScraped, assignToProject, papers } = useScrap()
+const { projects } = useProjects()
 const { tiltStyle, onMouseMove, onMouseLeave } = useTilt()
 
 const props = defineProps({
@@ -160,13 +241,32 @@ const props = defineProps({
 })
 const emit = defineEmits(['toggle'])
 
-const isExpanded    = ref(false)
-const isAiLoading   = ref(false)
-const aiSummary     = ref(null)
-const aiError       = ref(null)
-const translation   = ref(null)
-const isTranslating = ref(false)
-const showKorean    = ref(false)
+const isExpanded     = ref(false)
+const isAiLoading    = ref(false)
+const aiSummary      = ref(null)
+const aiError        = ref(null)
+const translation    = ref(null)
+const isTranslating  = ref(false)
+const showKorean     = ref(false)
+const showFolderPicker = ref(false)
+const showNewFolder    = ref(false)
+
+function currentFolderOf(pmid) {
+  return papers.value.find((p) => p.pmid === pmid)?.projectId ?? null
+}
+
+function saveToFolder(folderId) {
+  if (!isPaperScraped(props.paper.pmid)) {
+    scrapPaper(props.paper, aiSummary.value, folderId)
+  } else {
+    assignToProject(props.paper.pmid, folderId)
+  }
+  showFolderPicker.value = false
+}
+
+function onOutsideClick() { showFolderPicker.value = false }
+onMounted(() => document.addEventListener('click', onOutsideClick))
+onBeforeUnmount(() => document.removeEventListener('click', onOutsideClick))
 
 async function handleTranslate() {
   if (translation.value) { showKorean.value = !showKorean.value; return }
@@ -203,3 +303,9 @@ async function handleAiSummary() {
   }
 }
 </script>
+
+<style scoped>
+.folder-drop-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.folder-drop-leave-active { transition: opacity 0.1s ease, transform 0.1s ease; }
+.folder-drop-enter-from, .folder-drop-leave-to { opacity: 0; transform: translateY(4px); }
+</style>
