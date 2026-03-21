@@ -107,8 +107,8 @@
                 <span class="text-slate-400 tabular-nums">{{ totalCount.toLocaleString() }}건</span>
               </p>
 
-              <!-- 연구 동향 차트 -->
-              <div v-if="hasYearData || isChartLoading" class="mb-5 bg-surface border border-slate-800 rounded-xl overflow-hidden">
+              <!-- 연구 동향 차트 (모바일에서는 숨김) -->
+              <div v-if="hasYearData || isChartLoading" class="hidden sm:block mb-5 bg-surface border border-slate-800 rounded-xl overflow-hidden">
                 <button
                   class="w-full flex items-center justify-between px-4 py-3 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-elevated transition-all duration-150"
                   @click="showChart = !showChart"
@@ -185,7 +185,7 @@
         style="transform: translateX(-50%); animation: floatUp 0.35s ease forwards;"
       >
         <div class="flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-5 sm:py-3 bg-elevated border border-slate-700 rounded-2xl shadow-2xl shadow-black/60 backdrop-blur-sm">
-          <span class="text-xs text-slate-400 font-medium tabular-nums">
+          <span class="text-xs text-slate-400 font-medium tabular-nums whitespace-nowrap">
             <span class="text-slate-100 font-semibold">{{ selectedPapers.length }}</span>
             <span class="text-slate-600"> / {{ MAX_SELECT }}</span>
             &nbsp;편 선택

@@ -21,7 +21,7 @@
         />
       </div>
       <button
-        class="btn-primary px-4 sm:px-5 shrink-0"
+        class="hidden md:flex btn-primary px-4 sm:px-5 shrink-0 items-center"
         :disabled="isLoading || isSuggesting || !query.trim()"
         @click="handleSearch"
       >

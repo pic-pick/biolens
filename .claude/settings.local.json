@@ -22,7 +22,13 @@
       "Bash(curl:*)",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); uid=d[''''result''''][''''uids''''][0]; item=d[''''result''''][uid]; print\\(''''hasabstract:'''', repr\\(item.get\\(''''hasabstract''''\\)\\)\\); print\\(''''type:'''', type\\(item.get\\(''''hasabstract''''\\)\\).__name__\\)\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); uid=d[''''result''''][''''uids''''][0]; item=d[''''result''''][uid]; print\\(json.dumps\\({k:v for k,v in item.items\\(\\) if k not in [''''authors'''',''''articleids'''',''''history'''']}, indent=2\\)\\)\")",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

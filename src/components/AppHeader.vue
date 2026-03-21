@@ -53,5 +53,9 @@ const emit = defineEmits(['search', 'query-input', 'menu'])
 const searchBarRef = ref(null)
 defineExpose({ setQuery: (v) => searchBarRef.value?.setQuery(v) })
 
-function reload() { window.location.reload() }
+function reload() {
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    window.location.reload()
+  }
+}
 </script>

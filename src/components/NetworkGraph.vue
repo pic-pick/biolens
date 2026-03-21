@@ -13,9 +13,6 @@
           닫기
         </button>
 
-        <div class="w-px h-5 bg-slate-800" />
-        <span class="text-sm font-semibold text-slate-300">Citation Network</span>
-
         <!-- 로딩 / 완료 상태 -->
         <div v-if="isLoading" class="flex items-center gap-2 text-[11px] text-primary">
           <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -74,23 +71,6 @@
           </svg>
           S2 키 없음
         </div>
-      </div>
-
-      <!-- ── 논문 선택 탭 ── -->
-      <div class="shrink-0 border-b border-slate-800 bg-elevated px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
-        <span class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest shrink-0 pr-1">논문</span>
-        <button
-          v-for="paper in papers"
-          :key="paper.pmid"
-          class="shrink-0 px-3 py-1.5 rounded-lg text-[11px] border transition-all duration-150 max-w-[220px] truncate text-left"
-          :class="selectedPaper?.pmid === paper.pmid
-            ? 'bg-primary/20 border-primary/50 text-indigo-200 font-semibold'
-            : 'bg-transparent border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'"
-          @click="selectPaper(paper)"
-          :title="paper.title"
-        >
-          {{ paper.title }}
-        </button>
       </div>
 
       <!-- ── 메인 영역 ── -->
@@ -157,26 +137,6 @@
             </div>
           </Transition>
 
-          <!-- 논문 미선택 상태 -->
-          <div
-            v-if="!selectedPaper"
-            class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-slate-600"
-          >
-            <svg class="w-14 h-14 opacity-30" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-              <rect x="3" y="3" width="7" height="5" rx="1"/>
-              <rect x="14" y="3" width="7" height="5" rx="1"/>
-              <rect x="8" y="10" width="8" height="5" rx="1"/>
-              <path d="M6.5 8v2M17.5 8v2M12 15v4" stroke-linecap="round"/>
-            </svg>
-            <div class="text-center">
-              <p class="text-sm font-medium text-slate-500 mb-1">위에서 논문을 선택해주세요</p>
-              <p class="text-xs text-slate-700">선택한 논문의 선행·후속 연구를 시각화합니다</p>
-            </div>
-            <!-- 위 탭을 가리키는 화살표 힌트 -->
-            <svg class="w-5 h-5 text-slate-700 absolute top-16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
         </div>
 
       </div>

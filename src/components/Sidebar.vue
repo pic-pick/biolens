@@ -8,7 +8,7 @@
 
   <aside
     class="bg-surface border-r border-slate-800 flex flex-col overflow-hidden
-           fixed top-0 left-0 h-screen z-50 w-72
+           fixed top-0 left-0 h-screen z-50 w-[85vw] max-w-[17rem]
            md:relative md:h-auto md:z-auto md:shrink-0
            transition-all duration-300 ease-in-out"
     :class="[

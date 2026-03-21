@@ -1,8 +1,26 @@
 <template>
   <div class="flex flex-col md:flex-row gap-3 md:gap-5 h-full overflow-hidden relative">
 
+    <!-- 모바일 탭 (md 이상에서는 숨김) -->
+    <div class="flex md:hidden shrink-0 border border-slate-800 rounded-xl overflow-hidden">
+      <button
+        class="flex-1 py-2 text-xs font-medium transition-colors"
+        :class="mobileTab === 'papers' ? 'bg-primary/15 text-primary' : 'bg-elevated text-slate-500 hover:text-slate-300'"
+        @click="mobileTab = 'papers'"
+      >논문 <span class="opacity-60">{{ papers.length }}</span></button>
+      <div class="w-px bg-slate-800" />
+      <button
+        class="flex-1 py-2 text-xs font-medium transition-colors"
+        :class="mobileTab === 'analyses' ? 'bg-primary/15 text-primary' : 'bg-elevated text-slate-500 hover:text-slate-300'"
+        @click="mobileTab = 'analyses'"
+      >분석 <span class="opacity-60">{{ sortedAnalyses.length }}</span></button>
+    </div>
+
     <!-- ── 논문 스크랩 ── -->
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <div
+      class="flex-1 flex flex-col overflow-hidden min-w-0"
+      :class="mobileTab !== 'papers' ? 'hidden md:flex' : ''"
+    >
 
       <!-- 카드 뷰 헤더 -->
       <div v-if="!networkPaper" class="flex items-center justify-between mb-3 shrink-0">
@@ -73,10 +91,10 @@
           v-if="selectedPapers.length > 0 && !networkPaper"
           class="flex items-center gap-2 mb-3 px-4 py-2 bg-elevated border border-primary/30 rounded-xl shrink-0"
         >
-          <span class="text-xs font-semibold text-slate-200 tabular-nums">{{ selectedPapers.length }}<span class="text-slate-500 font-normal"> / {{ MAX_SELECT }}편 선택</span></span>
-          <div class="w-px h-3.5 bg-slate-700 mx-1" />
+          <span class="text-xs font-semibold text-slate-200 tabular-nums whitespace-nowrap">{{ selectedPapers.length }}<span class="text-slate-500 font-normal"> / {{ MAX_SELECT }}편 선택</span></span>
+          <div class="w-px h-3.5 bg-slate-700 mx-1 shrink-0" />
 
-          <!-- 폴더 배정 -->
+          <!-- 이동 -->
           <div class="relative" @click.stop>
             <button
               class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600 transition-all"
@@ -85,10 +103,7 @@
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              폴더 배정
-              <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              이동
             </button>
             <Transition name="proj-drop">
               <div v-if="showBulkFolder" class="absolute left-0 bottom-full mb-2 bg-elevated border border-slate-700 rounded-xl shadow-xl py-1 min-w-[156px] z-40">
@@ -132,14 +147,8 @@
             @click="showSynthesis = true"
           >Analyze</button>
 
-          <!-- 삭제 -->
           <button
-            class="text-xs px-3 py-1.5 rounded-lg border border-red-900/40 text-red-500 hover:bg-red-900/20 transition-all"
-            @click="deleteSelected"
-          >삭제</button>
-
-          <button
-            class="ml-auto text-[11px] text-slate-600 hover:text-slate-400 transition-colors"
+            class="ml-auto text-[11px] text-slate-600 hover:text-slate-400 transition-colors shrink-0"
             @click="selectedPapers = []"
           >취소</button>
         </div>
@@ -217,10 +226,13 @@
     </div>
 
     <!-- 구분선 -->
-    <div class="h-px md:h-auto md:w-px bg-slate-800 shrink-0" />
+    <div class="hidden md:block md:h-auto md:w-px bg-slate-800 shrink-0" />
 
     <!-- ── 종합분석 / 논문 탐색 ── -->
-    <div class="w-full md:w-[420px] md:shrink-0 flex flex-col overflow-hidden md:max-h-full max-h-[45vh]">
+    <div
+      class="w-full md:w-[420px] md:shrink-0 flex flex-col overflow-hidden md:max-h-full"
+      :class="mobileTab !== 'analyses' ? 'hidden md:flex max-h-[45vh]' : 'max-h-none'"
+    >
       <div class="flex items-center justify-between mb-4 shrink-0">
         <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-widest flex items-center gap-2">
           <Transition name="fade-label" mode="out-in">
@@ -273,7 +285,7 @@
                   <p class="text-[11px] text-slate-600">{{ formatDate(item.scrapedAt) }}</p>
                 </div>
                 <button
-                  class="text-[11px] text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                  class="text-[11px] text-slate-700 hover:text-red-400 transition-all shrink-0"
                   @click="unscrapSynthesis(item.id)"
                 >삭제</button>
               </div>
@@ -317,7 +329,7 @@
                   <span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/20 font-medium">Compare</span>
                   <p class="text-[11px] text-slate-600">{{ formatDate(item.scrapedAt) }}</p>
                 </div>
-                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                <div class="flex items-center gap-2">
                   <button
                     class="text-[11px] text-primary hover:text-blue-300 transition-colors"
                     @click="openSavedComparison(item)"
@@ -495,6 +507,7 @@ const { projects, activeProjectId, deleteProject } = useProjects()
 const showCreateModal     = ref(false)
 const networkPaper        = ref(null)   // 인라인 네트워크 뷰에 표시할 논문
 const networkSelectedNode = ref(null)   // 그래프에서 클릭한 노드
+const mobileTab           = ref('papers')  // 모바일 탭: 'papers' | 'analyses'
 
 // 프로젝트 필터
 const filteredPapers = computed(() => {
