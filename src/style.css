@@ -87,3 +87,20 @@ body {
 .will-fade-up {
   opacity: 0;
 }
+
+/* ── Mobile touch optimizations ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+/* Touch devices: always show hover-only elements */
+@media (hover: none) and (pointer: coarse) {
+  .touch-show { opacity: 1 !important; pointer-events: auto !important; }
+  .touch-hide { display: none !important; }
+}
+/* Mobile safe min touch target */
+@media (max-width: 767px) {
+  .tab-btn { @apply px-3 py-3 text-xs; }
+}

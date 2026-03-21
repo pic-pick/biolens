@@ -16,8 +16,8 @@
       <!-- top row: drag handle + year + delete -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <!-- drag handle -->
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-400 mr-1">
+          <!-- drag handle (데스크탑만) -->
+          <div class="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-400 mr-1">
             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
               <circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/>
               <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
@@ -87,7 +87,7 @@
             </Transition>
           </div>
         </div>
-        <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+        <div class="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-all touch-show">
           <!-- 비교/분석 전용 버튼 -->
           <button
             v-if="selectable"

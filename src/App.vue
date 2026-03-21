@@ -25,6 +25,7 @@
       :current-query="currentQuery"
       @search="handleSearch"
       @query-input="currentQuery = $event"
+      @menu="isMobileSidebarOpen = true"
     />
 
     <!-- Body -->
@@ -34,16 +35,18 @@
       <Sidebar
         ref="sidebar"
         :last-query="lastQuery"
+        :mobile-open="isMobileSidebarOpen"
         @search="handleSearch"
         @filter-change="onFilterChange"
         @about="showAbout = true"
+        @close-mobile="isMobileSidebarOpen = false"
       />
 
       <!-- Main content -->
       <main class="flex-1 flex flex-col overflow-hidden">
 
         <!-- Tab bar -->
-        <div class="shrink-0 bg-surface border-b border-slate-800 px-6 flex items-center">
+        <div class="shrink-0 bg-surface border-b border-slate-800 px-3 sm:px-6 flex items-center">
           <div class="flex">
             <button
               v-for="tab in tabs"
@@ -78,7 +81,7 @@
         <!-- Tab content -->
         <div
           ref="scrollContainer"
-          class="overflow-y-auto flex-1 p-6"
+          class="overflow-y-auto flex-1 p-3 sm:p-6"
           @scroll="onScroll"
         >
 
@@ -132,32 +135,18 @@
                 </div>
               </div>
 
-              <!-- Masonry 2열 -->
-              <div class="flex gap-4 items-start">
-                <div class="flex-1 flex flex-col gap-4">
-                  <PaperCard
-                    v-for="(paper, ci) in leftCol"
-                    :key="paper.pmid"
-                    :paper="paper"
-                    :fetch-abstract-single="fetchAbstractSingle"
-                    :is-selected="isSelected(paper)"
-                    :select-disabled="!isSelected(paper) && selectedPapers.length >= MAX_SELECT"
-                    :index="ci * 2"
-                    @toggle="toggleSelect"
-                  />
-                </div>
-                <div class="flex-1 flex flex-col gap-4">
-                  <PaperCard
-                    v-for="(paper, ci) in rightCol"
-                    :key="paper.pmid"
-                    :paper="paper"
-                    :fetch-abstract-single="fetchAbstractSingle"
-                    :is-selected="isSelected(paper)"
-                    :select-disabled="!isSelected(paper) && selectedPapers.length >= MAX_SELECT"
-                    :index="ci * 2 + 1"
-                    @toggle="toggleSelect"
-                  />
-                </div>
+                  <!-- 반응형 그리드: 모바일 1열, md 이상 2열 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <PaperCard
+                  v-for="(paper, i) in results"
+                  :key="paper.pmid"
+                  :paper="paper"
+                  :fetch-abstract-single="fetchAbstractSingle"
+                  :is-selected="isSelected(paper)"
+                  :select-disabled="!isSelected(paper) && selectedPapers.length >= MAX_SELECT"
+                  :index="i"
+                  @toggle="toggleSelect"
+                />
               </div>
 
               <!-- 무한 스크롤 로딩 인디케이터 -->
@@ -195,7 +184,7 @@
         class="fixed bottom-6 left-1/2 z-40"
         style="transform: translateX(-50%); animation: floatUp 0.35s ease forwards;"
       >
-        <div class="flex items-center gap-3 px-5 py-3 bg-elevated border border-slate-700 rounded-2xl shadow-2xl shadow-black/60 backdrop-blur-sm">
+        <div class="flex items-center gap-2 sm:gap-3 px-3 py-2.5 sm:px-5 sm:py-3 bg-elevated border border-slate-700 rounded-2xl shadow-2xl shadow-black/60 backdrop-blur-sm">
           <span class="text-xs text-slate-400 font-medium tabular-nums">
             <span class="text-slate-100 font-semibold">{{ selectedPapers.length }}</span>
             <span class="text-slate-600"> / {{ MAX_SELECT }}</span>
@@ -300,6 +289,9 @@ const hasSearched  = ref(false)
 const lastQuery    = ref('')
 const currentQuery = ref('')
 
+// Mobile sidebar
+const isMobileSidebarOpen = ref(false)
+
 // Multi-select
 const selectedPapers  = ref([])
 const showSynthesis   = ref(false)
@@ -330,10 +322,6 @@ function isSelected(paper) {
 function clearSelection() {
   selectedPapers.value = []
 }
-
-// Masonry
-const leftCol  = computed(() => results.value.filter((_, i) => i % 2 === 0))
-const rightCol = computed(() => results.value.filter((_, i) => i % 2 === 1))
 
 // Scroll progress + 무한 스크롤
 function onScroll(e) {

@@ -77,12 +77,12 @@
     <!-- 액션 버튼 -->
     <div class="flex flex-wrap gap-2 mt-4">
       <button
-        class="btn-ghost text-xs px-3 py-1.5"
+        class="btn-ghost text-xs px-3 py-2"
         @click="isExpanded = !isExpanded"
       >{{ isExpanded ? '접기' : '초록 보기' }}</button>
 
       <button
-        class="text-xs px-3 py-1.5 rounded-lg border transition-all duration-150 font-medium"
+        class="text-xs px-3 py-2 rounded-lg border transition-all duration-150 font-medium"
         :class="paper.hasAbstract
           ? 'border-primary/50 text-primary hover:bg-primary hover:text-white hover:border-primary'
           : 'border-slate-800 text-slate-700 cursor-not-allowed'"
@@ -104,19 +104,19 @@
         v-if="paper.pmcId"
         :href="`https://www.ncbi.nlm.nih.gov/pmc/articles/${paper.pmcId}/`"
         target="_blank" rel="noopener noreferrer"
-        class="text-xs px-3 py-1.5 rounded-lg border border-emerald-800/50 text-emerald-400 hover:bg-emerald-900/30 transition-all duration-150"
+        class="text-xs px-3 py-2 rounded-lg border border-emerald-800/50 text-emerald-400 hover:bg-emerald-900/30 transition-all duration-150"
       >Full Text</a>
 
       <a
         v-if="paper.doi"
         :href="`https://doi.org/${paper.doi}`"
         target="_blank" rel="noopener noreferrer"
-        class="text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300 transition-all duration-150"
+        class="text-xs px-3 py-2 rounded-lg border border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300 transition-all duration-150"
       >DOI</a>
 
       <!-- 비교/분석 전용 버튼 -->
       <button
-        class="text-xs px-3 py-1.5 rounded-lg border font-medium transition-all duration-150"
+        class="text-xs px-3 py-2 rounded-lg border font-medium transition-all duration-150"
         :class="!paper.hasAbstract
           ? 'border-slate-800/50 text-slate-700 opacity-40 cursor-not-allowed pointer-events-none'
           : isSelected
@@ -135,7 +135,7 @@
       <!-- Save 버튼 (폴더 피커) -->
       <div class="relative ml-auto" @click.stop>
         <button
-          class="text-xs px-3 py-1.5 rounded-lg border transition-all duration-150 flex items-center gap-1"
+          class="text-xs px-3 py-2 rounded-lg border transition-all duration-150 flex items-center gap-1"
           :class="isPaperScraped(paper.pmid)
             ? 'border-yellow-700/50 bg-yellow-900/20 text-yellow-500 hover:bg-yellow-900/30'
             : 'border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300'"
@@ -151,7 +151,7 @@
         <Transition name="folder-drop">
           <div
             v-if="showFolderPicker"
-            class="absolute bottom-full right-0 mb-1.5 z-30 bg-elevated border border-slate-700 rounded-xl shadow-xl py-1 min-w-[168px]"
+            class="absolute bottom-full right-0 mb-1.5 z-[60] bg-elevated border border-slate-700 rounded-xl shadow-xl py-1 min-w-[168px] max-h-[60vh] overflow-y-auto"
           >
             <p class="px-3 pt-1.5 pb-1 text-[10px] font-semibold text-slate-600 uppercase tracking-widest">폴더 선택 후 저장</p>
 

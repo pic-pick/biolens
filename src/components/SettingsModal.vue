@@ -4,7 +4,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       @click.self="emit('close')"
     >
-      <div class="bg-elevated border border-slate-700 rounded-2xl shadow-2xl w-[360px] overflow-hidden">
+      <div class="bg-elevated border border-slate-700 rounded-2xl shadow-2xl w-[90vw] max-w-[360px] overflow-hidden">
 
         <!-- Header -->
         <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800">
@@ -54,7 +54,7 @@
       class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70"
       @click.self="showConfirm = false"
     >
-      <div class="bg-elevated border border-slate-700 rounded-xl shadow-2xl w-[300px] p-5 flex flex-col gap-4">
+      <div class="bg-elevated border border-slate-700 rounded-xl shadow-2xl w-[90vw] max-w-[300px] p-5 flex flex-col gap-4">
         <p class="text-sm text-slate-200 font-medium">정말 초기화하시겠습니까?</p>
         <p class="text-xs text-slate-500 -mt-2">저장된 논문, 폴더, 분석 결과, 검색 기록이 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
         <div class="flex gap-2 justify-end">

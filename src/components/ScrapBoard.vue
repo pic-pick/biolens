@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-5 h-full overflow-hidden relative">
+  <div class="flex flex-col md:flex-row gap-3 md:gap-5 h-full overflow-hidden relative">
 
     <!-- ── 논문 스크랩 ── -->
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -171,8 +171,8 @@
 
       <!-- 카드 그리드 (masonry) -->
       <div v-else-if="!networkPaper" class="flex-1 overflow-y-auto">
-        <div class="flex gap-3 items-start">
-          <div class="flex-1 flex flex-col gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+          <div class="flex flex-col gap-3">
             <ScrapPaperCard
               v-for="(p, i) in leftPapers"
               :key="p.pmid"
@@ -192,7 +192,7 @@
               @drop.prevent="onDrop($event, papers.indexOf(p))"
             />
           </div>
-          <div class="flex-1 flex flex-col gap-3">
+          <div class="flex flex-col gap-3">
             <ScrapPaperCard
               v-for="(p, i) in rightPapers"
               :key="p.pmid"
@@ -217,10 +217,10 @@
     </div>
 
     <!-- 구분선 -->
-    <div class="w-px bg-slate-800 shrink-0" />
+    <div class="h-px md:h-auto md:w-px bg-slate-800 shrink-0" />
 
     <!-- ── 종합분석 / 논문 탐색 ── -->
-    <div class="w-[420px] shrink-0 flex flex-col overflow-hidden">
+    <div class="w-full md:w-[420px] md:shrink-0 flex flex-col overflow-hidden md:max-h-full max-h-[45vh]">
       <div class="flex items-center justify-between mb-4 shrink-0">
         <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-widest flex items-center gap-2">
           <Transition name="fade-label" mode="out-in">

@@ -4,7 +4,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       @click.self="$emit('close')"
     >
-      <div class="bg-surface border border-slate-700 rounded-2xl shadow-2xl w-72 p-5 animate-fade-up">
+      <div class="bg-surface border border-slate-700 rounded-2xl shadow-2xl w-[90vw] max-w-[288px] p-5 animate-fade-up">
 
         <!-- 헤더 -->
         <div class="flex items-center justify-between mb-4">

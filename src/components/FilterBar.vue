@@ -3,7 +3,7 @@
 
     <!-- 연도 범위 -->
     <div :class="vertical ? 'flex flex-col gap-1.5' : 'flex items-center gap-2'">
-      <label class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">
+      <label class="text-xs font-medium text-slate-400 uppercase tracking-wide">
         {{ vertical ? '연도 범위' : '연도' }}
       </label>
       <div class="flex items-center gap-1.5">
@@ -63,7 +63,7 @@
 
     <!-- 논문 유형 -->
     <div :class="vertical ? 'flex flex-col gap-1.5' : 'flex items-center gap-2'">
-      <label class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">
+      <label class="text-xs font-medium text-slate-400 uppercase tracking-wide">
         {{ vertical ? '논문 유형' : '유형' }}
       </label>
       <select
@@ -183,8 +183,8 @@ defineExpose({ filters, setYearRange })
 .year-btn {
   display: flex;
   align-items: center;
-  width: 4.5rem;
-  padding: 0.25rem 0.5rem;
+  min-width: 4.5rem;
+  padding: 0.5rem 0.625rem;
   font-size: 0.75rem;
   background: #1e293b;
   border: 1px solid #334155;
@@ -193,6 +193,7 @@ defineExpose({ filters, setYearRange })
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
   white-space: nowrap;
+  min-height: 2.5rem;
 }
 .year-btn:hover { border-color: #6366f1; color: #e2e8f0; }
 
@@ -201,8 +202,8 @@ defineExpose({ filters, setYearRange })
   top: calc(100% + 4px);
   left: 0;
   z-index: 50;
-  width: 5rem;
-  max-height: 180px;
+  min-width: 5rem;
+  max-height: 200px;
   overflow-y: auto;
   background: #1e293b;
   border: 1px solid #334155;
@@ -216,7 +217,7 @@ defineExpose({ filters, setYearRange })
 .year-option {
   display: block;
   width: 100%;
-  padding: 0.3rem 0.5rem;
+  padding: 0.45rem 0.625rem;
   font-size: 0.75rem;
   text-align: left;
   border-radius: 0.375rem;

@@ -21,7 +21,7 @@
         />
       </div>
       <button
-        class="btn-primary px-5 shrink-0"
+        class="btn-primary px-4 sm:px-5 shrink-0"
         :disabled="isLoading || isSuggesting || !query.trim()"
         @click="handleSearch"
       >
@@ -40,7 +40,7 @@
     <Transition name="drop">
       <div
         v-if="suggestions.length || suggestError"
-        class="absolute top-full left-0 right-0 mt-2 bg-elevated border border-slate-700 rounded-xl shadow-2xl shadow-black/50 p-3 z-50"
+        class="absolute top-full left-0 right-0 mt-2 bg-elevated border border-slate-700 rounded-xl shadow-2xl shadow-black/50 p-3 z-[70]"
       >
         <template v-if="suggestions.length">
           <p class="text-[11px] text-slate-500 uppercase tracking-wide mb-2.5 px-1">추천 검색어</p>

@@ -1,29 +1,47 @@
 <template>
+  <!-- 모바일 백드롭 -->
+  <div
+    v-if="mobileOpen"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+    @click="emit('close-mobile')"
+  />
+
   <aside
-    class="shrink-0 bg-surface border-r border-slate-800 flex flex-col overflow-hidden transition-[width] duration-300 ease-in-out"
-    :class="expanded ? 'w-52' : 'w-14'"
+    class="bg-surface border-r border-slate-800 flex flex-col overflow-hidden
+           fixed top-0 left-0 h-screen z-50 w-72
+           md:relative md:h-auto md:z-auto md:shrink-0
+           transition-all duration-300 ease-in-out"
+    :class="[
+      mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+      expanded ? 'md:w-52' : 'md:w-14',
+    ]"
   >
 
-    <!-- 토글 버튼 -->
+    <!-- 토글 버튼 (데스크탑) / 닫기 버튼 (모바일) -->
     <button
       class="flex items-center justify-center h-10 border-b border-slate-800 text-slate-500 hover:text-slate-300 hover:bg-elevated transition-colors shrink-0"
-      @click="expanded = !expanded"
       :title="expanded ? '사이드바 접기' : '사이드바 열기'"
+      @click="handleToggle"
     >
-      <svg class="w-4 h-4 transition-transform duration-300" :class="expanded ? '' : 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <!-- 데스크탑: 접기/펼치기 화살표 -->
+      <svg class="hidden md:block w-4 h-4 transition-transform duration-300" :class="expanded ? '' : 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <!-- 모바일: X 닫기 -->
+      <svg class="md:hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
       </svg>
     </button>
 
     <div class="flex-1 overflow-y-auto overflow-x-hidden">
 
       <!-- 필터 섹션 -->
-      <div class="border-b border-slate-800" :class="expanded ? 'px-3 pt-4 pb-3' : 'py-3 flex justify-center'">
-        <template v-if="expanded">
+      <div class="border-b border-slate-800" :class="(expanded || props.mobileOpen) ? 'px-3 pt-4 pb-3' : 'py-3 flex justify-center'">
+        <template v-if="expanded || props.mobileOpen">
           <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3">Filters</p>
           <FilterBar ref="filterBarRef" :vertical="true" @change="emit('filter-change')" />
         </template>
-        <template v-else>
+        <template v-else-if="!props.mobileOpen">
           <button class="text-slate-600 hover:text-slate-300 transition-colors" title="필터" @click="expanded = true">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M3 4h18M7 10h10M11 16h2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -33,8 +51,8 @@
       </div>
 
       <!-- 최근 검색 -->
-      <div v-if="history.length" class="border-b border-slate-800" :class="expanded ? 'px-3 py-3' : 'py-3 flex justify-center'">
-        <template v-if="expanded">
+      <div v-if="history.length" class="border-b border-slate-800" :class="(expanded || props.mobileOpen) ? 'px-3 py-3' : 'py-3 flex justify-center'">
+        <template v-if="expanded || props.mobileOpen">
           <div class="flex items-center justify-between mb-2">
             <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Recent</p>
             <button class="text-[10px] text-slate-600 hover:text-slate-400 transition-colors" @click="clearHistory">Clear</button>
@@ -51,13 +69,13 @@
                 @click="emit('search', q)"
               >{{ q }}</button>
               <button
-                class="opacity-0 group-hover:opacity-100 text-[10px] text-slate-700 hover:text-red-400 transition-all duration-150 shrink-0 ml-1"
+                class="touch-show opacity-0 group-hover:opacity-100 text-[10px] text-slate-700 hover:text-red-400 transition-all duration-150 shrink-0 ml-1"
                 @click.stop="removeHistory(q)"
               >✕</button>
             </div>
           </div>
         </template>
-        <template v-else>
+        <template v-else-if="!props.mobileOpen">
           <button class="text-slate-600 hover:text-slate-300 transition-colors" title="최근 검색" @click="expanded = true">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -67,8 +85,8 @@
       </div>
 
       <!-- 빠른 검색 / AI 추천 / 트렌딩 -->
-      <div :class="expanded ? 'px-3 py-3' : 'py-3 flex justify-center'">
-        <template v-if="expanded">
+      <div :class="(expanded || props.mobileOpen) ? 'px-3 py-3' : 'py-3 flex justify-center'">
+        <template v-if="expanded || props.mobileOpen">
           <div class="flex items-center gap-2 mb-2">
             <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest">
               {{ aiSuggestions.length ? 'Related' : 'Trending' }}
@@ -120,7 +138,7 @@
             </button>
           </div>
         </template>
-        <template v-else>
+        <template v-else-if="!props.mobileOpen">
           <button class="text-slate-600 hover:text-slate-300 transition-colors" title="트렌딩 토픽" @click="expanded = true">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/>
@@ -134,9 +152,9 @@
     <!-- 하단 About / Settings -->
     <div
       class="shrink-0 border-t border-slate-800 flex flex-col"
-      :class="expanded ? 'px-3 py-3 gap-1' : 'py-3 items-center gap-3'"
+      :class="(expanded || props.mobileOpen) ? 'px-3 py-3 gap-1' : 'py-3 items-center gap-3'"
     >
-      <template v-if="expanded">
+      <template v-if="expanded || props.mobileOpen">
         <button
           class="sidebar-item w-full text-left text-sm text-slate-500 hover:text-slate-300 transition-colors"
           title="About BioLens"
@@ -161,7 +179,7 @@
           Settings
         </button>
       </template>
-      <template v-else>
+      <template v-else-if="!props.mobileOpen">
         <button class="text-slate-600 hover:text-slate-300 transition-colors p-1" title="About BioLens" @click="emit('about')">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/>
@@ -189,8 +207,20 @@ import { useSearchHistory } from '../composables/useSearchHistory.js'
 import { suggestQueries } from '../composables/useOpenAI.js'
 import { useTrending } from '../composables/useTrending.js'
 
-const props = defineProps({ lastQuery: { type: String, default: '' } })
-const emit  = defineEmits(['search', 'filter-change', 'about'])
+const props = defineProps({
+  lastQuery:  { type: String,  default: '' },
+  mobileOpen: { type: Boolean, default: false },
+})
+const emit  = defineEmits(['search', 'filter-change', 'about', 'close-mobile'])
+
+function handleToggle() {
+  // 모바일에서는 닫기, 데스크탑에서는 접기/펼치기
+  if (window.innerWidth < 768) {
+    emit('close-mobile')
+  } else {
+    expanded.value = !expanded.value
+  }
+}
 
 const { history, removeHistory, clearHistory } = useSearchHistory()
 

@@ -1036,6 +1036,28 @@ onBeforeUnmount(() => observer?.disconnect())
 .footer-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(99,102,241,0.5); }
 
 /* ══════════════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 767px) {
+  .about-nav { padding: 0 1rem; }
+  .ab-section { padding: 3rem 1rem; }
+  .overview-section { padding-top: 2.5rem; }
+  .overview-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .overview-title { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+  .feat-grid { grid-template-columns: 1fr; }
+  .steps-list { gap: 0; }
+  .sources-grid { grid-template-columns: repeat(2, 1fr); }
+  .faq-grid { grid-template-columns: 1fr; }
+  .tech-row { flex-direction: column; }
+  .tech-block { padding: 1.25rem 1.5rem; }
+  .tech-divider { width: 100%; height: 1px; }
+  .footer-bottom { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  .stat-num { font-size: 1.875rem; }
+  .ab-title { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+  .nav-logo span { display: none; }
+}
+
+/* ══════════════════════════════════════
    SCROLL ANIMATIONS
 ══════════════════════════════════════ */
 [data-animate] {
