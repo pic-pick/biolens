@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "Bash(command -v pnpm)",
+      "Bash(pnpm --version)",
+      "Bash(npm --version)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm add:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm run:*)",
+      "Bash(pkill -f \"vite --port 5173\")",
+      "Bash(mv biolens/.env .)",
+      "Bash(mv biolens/.env.example .)",
+      "Bash(mv biolens/.gitignore .)",
+      "Bash(mv biolens/.vscode .)",
+      "Bash(mv biolens/README.md .)",
+      "Bash(curl -s \"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=breast+cancer[tiab]&retmax=3&retmode=json&api_key=efc5b90630b99b61dc236bcc3974d1c4de08\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); uid=d[''''result''''][''''uids''''][0]; item=d[''''result''''][uid]; print\\(''''hasabstract:'''', repr\\(item.get\\(''''hasabstract''''\\)\\)\\); print\\(''''type:'''', type\\(item.get\\(''''hasabstract''''\\)\\).__name__\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); uid=d[''''result''''][''''uids''''][0]; item=d[''''result''''][uid]; print\\(json.dumps\\({k:v for k,v in item.items\\(\\) if k not in [''''authors'''',''''articleids'''',''''history'''']}, indent=2\\)\\)\")",
+      "Bash(npx vite:*)"
+    ]
+  }
+}

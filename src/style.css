@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: #060B18;
+  color: #E2E8F0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #2D4060; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+
+/* Shimmer utility */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #1E293B 25%,
+    #2D4060 50%,
+    #1E293B 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@layer components {
+  .tab-btn {
+    @apply relative px-4 py-3 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors duration-150 whitespace-nowrap;
+  }
+  .tab-active {
+    @apply text-primary;
+  }
+  .tab-btn .tab-indicator {
+    @apply absolute bottom-0 left-0 right-0 h-[2px] bg-primary origin-left transition-transform duration-200;
+  }
+
+  .card-dark {
+    background-color: #0F172A;
+    @apply border border-slate-800 rounded-xl transition-all duration-200;
+  }
+  .card-dark:hover {
+    border-color: #2D4060;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.15), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 text-white rounded-lg text-sm font-medium
+           active:scale-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+    background-color: #3B82F6;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: #2563EB;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 border border-slate-700 text-slate-400 rounded-lg text-sm font-medium
+           hover:border-slate-600 hover:text-slate-200 active:scale-95 transition-all duration-150;
+  }
+  .input-dark {
+    background-color: #0F172A;
+    @apply border border-slate-700 text-slate-200 placeholder:text-slate-600
+           rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary
+           transition-all duration-150;
+  }
+  .input-dark:focus {
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  }
+}
+
+/* Fade-up for stagger — initial hidden state */
+.will-fade-up {
+  opacity: 0;
+}
